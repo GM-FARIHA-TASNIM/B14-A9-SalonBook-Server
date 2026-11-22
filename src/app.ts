@@ -12,21 +12,18 @@ import stripeWebhookRoutes from "./routes/stripe-webhook.routes.js";
 
 const app = express();
 
-const clientURL = (process.env.CLIENT_URL || "http://localhost:3000").replace(
-  /\/+$/,
-  "",
-);
-/*
-const allowedOrigins = [
-  clientURL,
-  "http://localhost:3000",
-  "https://b14-a9-salon-book-client.vercel.app",
-];*/
+const clientURL = process.env.CLIENT_URL || "http://localhost:3000";
 
 // CORS Configuration
-app.use(cors());
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  }),
+);
 
-// Stripe Webhook - before express.json()
+// Stripe Webhook
+// IMPORTANT: Must be registered before express.json()
 app.use(
   "/api/stripe/webhook",
   express.raw({ type: "application/json" }),
