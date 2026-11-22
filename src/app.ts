@@ -16,30 +16,15 @@ const clientURL = (process.env.CLIENT_URL || "http://localhost:3000").replace(
   /\/+$/,
   "",
 );
-
+/*
 const allowedOrigins = [
   clientURL,
   "http://localhost:3000",
   "https://b14-a9-salon-book-client.vercel.app",
-];
+];*/
 
 // CORS Configuration
-app.use(
-  cors({
-    origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-        return;
-      }
-
-      console.warn("CORS blocked origin:", origin);
-      callback(null, false);
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  }),
-);
+app.use(cors());
 
 // Stripe Webhook - before express.json()
 app.use(
