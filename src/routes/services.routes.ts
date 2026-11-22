@@ -4,6 +4,7 @@ import { z } from "zod";
 import { fromNodeHeaders } from "better-auth/node";
 import { auth } from "../config/auth.js";
 import { getDB } from "../config/db.js";
+import { isAdmin } from "../utils/admin.js";
 
 const router = Router();
 
@@ -16,20 +17,6 @@ const serviceSchema = z.object({
   image: z.url(),
   featured: z.boolean().default(false),
 });
-
-async function isAdmin(req: Request) {
-  const session = await auth.api.getSession({
-    headers: fromNodeHeaders(req.headers),
-  });
-
-  if (!session) return false;
-
-  const user = await getDB()
-    .collection("user")
-    .findOne({ id: session.user.id });
-
-  return user?.role === "admin";
-}
 
 router.get("/", async (req: Request, res: Response) => {
   try {
