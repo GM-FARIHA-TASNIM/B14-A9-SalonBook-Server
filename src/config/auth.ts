@@ -2,10 +2,21 @@ import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { db, mongoClient } from "./db.js";
 
-const clientURL = process.env.CLIENT_URL || "http://localhost:3000";
+const isProduction = process.env.NODE_ENV === "production";
+
+const clientURL = (process.env.CLIENT_URL || "http://localhost:3000").replace(
+  /\/+$/,
+  "",
+);
+
+const serverURL = (
+  process.env.BETTER_AUTH_URL || "http://localhost:5000"
+).replace(/\/+$/, "");
 
 export const auth = betterAuth({
   appName: "SalonBook",
+
+  baseURL: serverURL,
 
   database: mongodbAdapter(db, {
     client: mongoClient,
@@ -26,5 +37,18 @@ export const auth = betterAuth({
         }
       : {},
 
-  trustedOrigins: [clientURL, "http://localhost:3000"],
+  trustedOrigins: isProduction
+    ? [clientURL]
+    : [clientURL, "http://localhost:3000"],
+
+  advanced: {
+    useSecureCookies: isProduction,
+
+    defaultCookieAttributes: {
+      sameSite: isProduction ? "none" : "lax",
+      secure: isProduction,
+      httpOnly: true,
+      path: "/",
+    },
+  },
 });
